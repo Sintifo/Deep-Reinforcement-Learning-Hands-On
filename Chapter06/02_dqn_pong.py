@@ -66,7 +66,7 @@ class Agent:
             action = env.action_space.sample()
         else:
             state_a = np.array([self.state], copy=False)
-            state_v = torch.tensor(state_a).to(device)
+            state_v = torch.tensor(state_a, dtype=torch.float32).to(device)
             q_vals_v = net(state_v)
             _, act_v = torch.max(q_vals_v, dim=1)
             action = int(act_v.item())
@@ -88,10 +88,10 @@ class Agent:
 def calc_loss(batch, net, tgt_net, device="cpu"):
     states, actions, rewards, dones, next_states = batch
 
-    states_v = torch.tensor(states).to(device)
-    next_states_v = torch.tensor(next_states).to(device)
-    actions_v = torch.tensor(actions).to(device)
-    rewards_v = torch.tensor(rewards).to(device)
+    states_v = torch.tensor(states, dtype=torch.float32).to(device)
+    next_states_v = torch.tensor(next_states, dtype=torch.float32).to(device)
+    actions_v = torch.tensor(actions, dtype=torch.long).to(device)
+    rewards_v = torch.tensor(rewards, dtype=torch.float32).to(device)
     done_mask = torch.ByteTensor(dones).to(device)
 
     state_action_values = net(states_v).gather(1, actions_v.unsqueeze(-1)).squeeze(-1)
